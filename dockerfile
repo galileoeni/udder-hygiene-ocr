@@ -29,4 +29,4 @@ COPY . .
 EXPOSE 5000
 
 # Run the application
-CMD ["gunicorn", "ocr_automation_backend:app", "--bind", "0.0.0.0:5000"]
+CMD ["gunicorn", "ocr-automation-backend:app", "--bind", "0.0.0.0:5000"]

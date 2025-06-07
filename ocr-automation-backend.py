@@ -436,7 +436,61 @@ def get_demo_data():
     ]
     return jsonify({'success': True, 'data': demo_data})
 
-
+@app.route('/api/test-ocr', methods=['POST'])
+def test_ocr_debug():
+    """Debug endpoint to test OCR"""
+    try:
+        if 'file' not in request.files:
+            # Create a simple test image
+            import numpy as np
+            test_img = np.ones((200, 400, 3), dtype=np.uint8) * 255
+            cv2.putText(test_img, "Test 123", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 3)
+            
+            # Test OCR
+            text = pytesseract.image_to_string(test_img)
+            
+            return jsonify({
+                'success': True,
+                'test_image_text': text,
+                'tesseract_version': pytesseract.get_tesseract_version().decode('utf-8'),
+                'status': 'OCR is working'
+            })
+        
+        # Process uploaded file
+        file = request.files['file']
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        
+        # Read image
+        image = cv2.imread(filepath)
+        
+        # Get raw OCR text
+        raw_text = pytesseract.image_to_string(image)
+        
+        # Also try with preprocessing
+        processed_image = ocr_processor.preprocess_image(image)
+        processed_text = pytesseract.image_to_string(processed_image)
+        
+        # Clean up
+        os.remove(filepath)
+        
+        return jsonify({
+            'success': True,
+            'filename': filename,
+            'raw_ocr_text': raw_text[:1000],  # First 1000 chars
+            'processed_ocr_text': processed_text[:1000],
+            'raw_text_length': len(raw_text),
+            'processed_text_length': len(processed_text),
+            'tesseract_version': pytesseract.get_tesseract_version().decode('utf-8')
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'error_type': type(e).__name__
+        })
 import os
 
 if __name__ == '__main__':

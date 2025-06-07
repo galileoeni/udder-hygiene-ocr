@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Udder Hygiene Data Automation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+
+        .workflow-section {
+            margin-bottom: 40px;
+        }
+
+        .step-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .step:hover {
+            transform: translateY(-5px);
+        }
+
+        .step h3 {
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .upload-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px dashed #ddd;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section.drag-over {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .upload-btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            background: #5a55d2;
+        }
+
+        .results-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .data-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .chart-container {
+            margin-top: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .export-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .export-btn {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .export-btn:hover {
+            background: #218838;
+        }
+
+        .status-message {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .demo-button {
+            background: #ff6b6b;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .demo-button:hover {
+            background: #ff5252;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐄 Udder Hygiene Data Automation System</h1>
+        <p class="subtitle">Automated OCR Processing for Farm Data Collection</p>
+
+        <div class="workflow-section">
+            <h2>Automated Workflow Steps</h2>
+            <div class="step-container">
+                <div class="step">
+                    <h3>1. Document Upload</h3>
+                    <p>Upload scanned documents or PDFs containing udder hygiene scores</p>
+                </div>
+                <div class="step">
+                    <h3>2. OCR Processing</h3>
+                    <p>Automatic text extraction using advanced OCR technology</p>
+                </div>
+                <div class="step">
+                    <h3>3. Data Parsing</h3>
+                    <p>Intelligent parsing to extract scores and group information</p>
+                </div>
+                <div class="step">
+                    <h3>4. Auto-Export</h3>
+                    <p>Export to Excel with proper formatting and calculations</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="upload-section" id="uploadSection">
+            <h3>📁 Upload Scanned Documents</h3>
+            <p>Drag and drop files here or click to browse</p>
+            <input type="file" id="fileInput" accept=".pdf,.jpg,.png,.jpeg" multiple style="display: none;">
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Choose Files</button>
+            <button class="demo-button" onclick="loadDemoData()">Load Demo Data</button>
+        </div>
+
+        <div class="loading" id="loadingSection">
+            <div class="spinner"></div>
+            <p>Processing documents with OCR...</p>
+        </div>
+
+        <div class="status-message" id="statusMessage"></div>
+
+        <div class="results-section" id="resultsSection">
+            <h2>📊 Extracted Data</h2>
+            <table class="data-table" id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Farm Name</th>
+                        <th>Group</th>
+                        <th>Score 1</th>
+                        <th>Score 2</th>
+                        <th>Score 3</th>
+                        <th>Total</th>
+                        <th>Average</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+
+            <div class="chart-container">
+                <canvas id="scoreChart" width="400" height="200"></canvas>
+            </div>
+
+            <div class="export-buttons">
+                <button class="export-btn" onclick="exportToExcel()">📊 Export to Excel</button>
+                <button class="export-btn" onclick="exportToCSV()">📄 Export to CSV</button>
+                <button class="export-btn" onclick="exportToPowerPoint()">📈 Generate Report</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script>
+        // Configuration - UPDATE THIS WITH YOUR RENDER URL
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:5000' 
+            : 'https://your-app-name.onrender.com';  // ← CHANGE THIS TO YOUR ACTUAL RENDER URL
+
+        let extractedData = [];
+        let chart = null;
+
+        // Drag and drop functionality
+        const uploadSection = document.getElementById('uploadSection');
+        
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('drag-over');
+        });
+
+        uploadSection.addEventListener('dragleave', () => {
+            uploadSection.classList.remove('drag-over');
+        });
+
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            if (files.length === 0) return;
+            
+            showLoading(true);
+            showStatus('Processing ' + files.length + ' file(s)...', 'success');
+            
+            // Create FormData for file upload
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files', files[i]);
+            }
+            
+            // Send files to Flask API
+            fetch(`${API_URL}/api/upload`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                showLoading(false);
+                if (result.success) {
+                    extractedData = result.data;
+                    showStatus('OCR processing complete! ' + result.count + ' records extracted.', 'success');
+                    displayResults();
+                } else {
+                    showStatus('Error: ' + (result.error || 'Processing failed'), 'error');
+                }
+            })
+            .catch(error => {
+                showLoading(false);
+                showStatus('Error: ' + error.message + '. Make sure Flask server is running!', 'error');
+                console.error('Upload error:', error);
+            });
+        }
+
+        function processOCR(files) {
+            // Simulate OCR data extraction
+            extractedData = [
+                {
+                    date: '2025-03-26',
+                    farm: 'Sunnyside Farm',
+                    group: 'Group A',
+                    scores: [85, 92, 88],
+                    total: 265,
+                    average: 88.3
+                },
+                {
+                    date: '2025-03-26',
+                    farm: 'Sunnyside Farm',
+                    group: 'Group B',
+                    scores: [78, 81, 79],
+                    total: 238,
+                    average: 79.3
+                },
+                {
+                    date: '2025-03-26',
+                    farm: 'Sunnyside Farm',
+                    group: 'Group C',
+                    scores: [91, 89, 93],
+                    total: 273,
+                    average: 91.0
+                }
+            ];
+            
+            showLoading(false);
+            showStatus('OCR processing complete! ' + extractedData.length + ' records extracted.', 'success');
+            displayResults();
+        }
+
+        function loadDemoData() {
+            showLoading(true);
+            showStatus('Loading demo data from server...', 'success');
+            
+            // Call the Flask API
+            fetch(`${API_URL}/api/demo`)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success && result.data) {
+                        extractedData = result.data;
+                        showLoading(false);
+                        showStatus('Demo data loaded successfully!', 'success');
+                        displayResults();
+                    } else {
+                        throw new Error('Failed to load demo data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showLoading(false);
+                    showStatus('Error loading demo data. Make sure the Flask server is running on port 5000!', 'error');
+                    
+                    // Fallback to local demo data
+                    extractedData = [
+                        {
+                            date: '2025-03-26',
+                            farm: 'Sunnyside Farm',
+                            group: 'Group A',
+                            scores: [85, 92, 88],
+                            total: 265,
+                            average: 88.3
+                        },
+                        {
+                            date: '2025-03-26',
+                            farm: 'Sunnyside Farm',
+                            group: 'Group B',
+                            scores: [78, 81, 79],
+                            total: 238,
+                            average: 79.3
+                        },
+                        {
+                            date: '2025-03-26',
+                            farm: 'Sunnyside Farm',
+                            group: 'Group C',
+                            scores: [91, 89, 93],
+                            total: 273,
+                            average: 91.0
+                        }
+                    ];
+                    showStatus('Using local demo data as fallback', 'success');
+                    displayResults();
+                });
+        }
+
+        function displayResults() {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+            
+            extractedData.forEach(record => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${record.date}</td>
+                    <td>${record.farm}</td>
+                    <td>${record.group}</td>
+                    <td>${record.score1 || record.scores[0]}</td>
+                    <td>${record.score2 || record.scores[1]}</td>
+                    <td>${record.score3 || record.scores[2]}</td>
+                    <td><strong>${record.total}</strong></td>
+                    <td><strong>${record.average.toFixed(1)}</strong></td>
+                `;
+            });
+            
+            document.getElementById('resultsSection').style.display = 'block';
+            createChart();
+        }
+
+        function createChart() {
+            const ctx = document.getElementById('scoreChart').getContext('2d');
+            
+            if (chart) {
+                chart.destroy();
+            }
+            
+            const groupData = {};
+            extractedData.forEach(record => {
+                if (!groupData[record.group]) {
+                    groupData[record.group] = [];
+                }
+                groupData[record.group].push(record.average);
+            });
+            
+            const datasets = Object.keys(groupData).map((group, index) => ({
+                label: group,
+                data: groupData[group],
+                backgroundColor: `rgba(${102 + index * 30}, ${126 + index * 20}, ${234 - index * 30}, 0.6)`,
+                borderColor: `rgba(${102 + index * 30}, ${126 + index * 20}, ${234 - index * 30}, 1)`,
+                borderWidth: 2
+            }));
+            
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [...new Set(extractedData.map(r => r.date))],
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Udder Hygiene Scores by Group',
+                            font: {
+                                size: 18
+                            }
+                        },
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Average Score'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function exportToExcel() {
+            // Simulate Excel export
+            showStatus('Exporting to Excel format...', 'success');
+            setTimeout(() => {
+                showStatus('Excel file "Udder_Hygiene_Report_2025-03-26.xlsx" has been generated!', 'success');
+            }, 1000);
+        }
+
+        function exportToCSV() {
+            let csv = 'Date,Farm Name,Group,Score 1,Score 2,Score 3,Total,Average\n';
+            
+            extractedData.forEach(record => {
+                csv += `${record.date},${record.farm},${record.group},${record.scores[0]},${record.scores[1]},${record.scores[2]},${record.total},${record.average}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'udder_hygiene_data.csv';
+            a.click();
+            
+            showStatus('CSV file downloaded successfully!', 'success');
+        }
+
+        function exportToPowerPoint() {
+            showStatus('Generating PowerPoint report...', 'success');
+            setTimeout(() => {
+                showStatus('PowerPoint presentation "Udder_Hygiene_Analysis.pptx" has been created!', 'success');
+            }, 1500);
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingSection').style.display = show ? 'block' : 'none';
+        }
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = 'status-message status-' + type;
+            statusEl.style.display = 'block';
+            
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

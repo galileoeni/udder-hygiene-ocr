@@ -28,5 +28,10 @@ COPY . .
 # Expose port
 EXPOSE 5000
 
-# Run the application
-CMD ["gunicorn", "ocr-automation-backend:app", "--bind", "0.0.0.0:5000"]
+# Add long timeout in case of large model loading
+CMD ["gunicorn", "ocr-automation-backend:app", "--bind", "0.0.0.0:5000", "--timeout", "120"]
+
+
+
+
+
